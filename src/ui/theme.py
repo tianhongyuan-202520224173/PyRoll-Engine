@@ -1,46 +1,46 @@
-"""Claude-inspired dark UI theme — colors, fonts, and spacing."""
+"""自定义主题 —— 冷色深底 + 朱红点缀，字体与配色均可在此统一调整。"""
 
 COLORS = {
-    # Backgrounds (dark, warm-tinted)
-    "bg_primary":   "#1A1917",
-    "bg_secondary": "#221F1D",
-    "bg_card":      "#252220",
-    "bg_header":    "#0F0D0C",
-    "bg_input":     "#2D2A28",
-    "bg_hover":     "#302D2B",
+    # 背景色（冷色深底）
+    "bg_primary":   "#17181C",
+    "bg_secondary": "#1F2127",
+    "bg_card":      "#24262D",
+    "bg_header":    "#0E0F12",
+    "bg_input":     "#2C2F37",
+    "bg_hover":     "#31343D",
 
-    # Accent — Claude coral / terracotta
-    "accent_primary": "#D97559",
-    "accent_hover":   "#E8896A",
+    # 强调色 —— 朱红
+    "accent_primary": "#D8392B",
+    "accent_hover":   "#E85444",
 
-    # Secondary button
-    "btn_secondary":       "#3A3530",
-    "btn_secondary_hover": "#4A4540",
+    # 次要按钮
+    "btn_secondary":       "#34373F",
+    "btn_secondary_hover": "#434650",
 
-    # Text
-    "text_primary":   "#F0EBE3",
-    "text_secondary": "#9B8878",
-    "text_muted":     "#6B5E4E",
-    "text_on_dark":   "#F0EBE3",
+    # 文字
+    "text_primary":   "#ECEDF0",
+    "text_secondary": "#9AA0AC",
+    "text_muted":     "#6B7280",
+    "text_on_dark":   "#ECEDF0",
     "text_on_accent": "#FFFFFF",
 
-    # Borders
-    "border_light":  "#3A3530",
-    "border_medium": "#4A4540",
+    # 边框
+    "border_light":  "#34373F",
+    "border_medium": "#434650",
 
-    # Status
-    "success": "#5A9E6F",
-    "warning": "#D4A843",
+    # 状态色
+    "success": "#4CAF7D",
+    "warning": "#D9A93F",
     "error":   "#E05252",
 }
 
 FONTS = {
-    "heading_lg": ("Segoe UI", 16, "bold"),
-    "heading_md": ("Segoe UI", 13, "bold"),
-    "body_md":    ("Segoe UI", 11),
-    "body_sm":    ("Segoe UI", 10),
+    "heading_lg": ("Microsoft YaHei UI", 16, "bold"),
+    "heading_md": ("Microsoft YaHei UI", 13, "bold"),
+    "body_md":    ("Microsoft YaHei UI", 11),
+    "body_sm":    ("Microsoft YaHei UI", 10),
     "mono_md":    ("Consolas", 11),
-    "label":      ("Segoe UI", 9, "bold"),
+    "label":      ("Microsoft YaHei UI", 9, "bold"),
 }
 
 PAD = {
