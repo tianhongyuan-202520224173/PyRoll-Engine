@@ -170,3 +170,32 @@ To report a vulnerability, see [SECURITY.md](SECURITY.md). Do not open a public 
 ## License
 
 Distributed under the terms of the [LICENSE](LICENSE) file in this repository.
+
+
+---
+
+## 本地运行记录（Windows，验证环境可用）
+
+以下为 fork 后在本机的运行验证记录，确认原版项目可以直接跑通：
+
+```text
+> python --version
+Python 3.13.17
+
+> python -m venv .venv
+> .venv\Scripts\activate
+> pip install -r requirements.txt
+> python main.py
+```
+
+验证结果：
+
+- 单元测试 `pytest -q`：9 passed
+- 程序正常启动，窗口标题 "PyRoll Engine"，默认进入 Calculate 标签页
+- 本机未安装 Redis，程序自动回退 In-Memory Mode，状态栏提示正常
+- 员工列表默认显示 2 条演示数据（John Doe / Jane Smith）
+
+常见问题：
+
+- 若 `python main.py` 报 `No module named tkinter`，说明当前 Python 是精简版，
+  请到 python.org 安装完整版 Python 3.10+ 后重试。
