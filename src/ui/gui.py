@@ -1,4 +1,4 @@
-"""PyRoll Engine — main application window, rebranded with custom name & icon."""
+"""薪酬管家（PayrollPro）— 主窗口，中文界面，基于原 PyRoll Engine 改造。"""
 
 import os
 import tkinter as tk
@@ -9,11 +9,11 @@ from ..database.database import Database
 from ..engine.payroll import PayrollCalculator
 from .theme import COLORS, FONTS, PAD
 
-CURRENCY = "$"
+CURRENCY = "¥"
 
 
 class PyRollEngine:
-    """Root application window."""
+    """根应用窗口。"""
 
     def __init__(self) -> None:
         self.db   = Database()
@@ -22,7 +22,7 @@ class PyRollEngine:
         self._setup_styles()
         self._build_ui()
 
-    # ── Window & styles ───────────────────────────────────────────────────────
+    # ── 窗口与样式 ───────────────────────────────────────────────────────
 
     def _setup_window(self) -> None:
         self.root = tk.Tk()
@@ -36,7 +36,7 @@ class PyRollEngine:
         self.root.geometry(f"760x840+{(sw-760)//2}+{(sh-840)//2}")
 
     def _apply_icon(self) -> None:
-        """Set the window icon; missing icon never blocks startup."""
+        """设置窗口图标；图标缺失时不影响启动。"""
         if ICON_PATH and os.path.exists(ICON_PATH):
             try:
                 self.root.iconbitmap(default=ICON_PATH)
@@ -78,7 +78,7 @@ class PyRollEngine:
             background=[("selected", COLORS["bg_hover"])],
             foreground=[("selected", COLORS["text_primary"])])
 
-    # ── Top-level layout ────────────────────────────────────────────────────────
+    # ── 整体布局 ────────────────────────────────────────────────────────
 
     def _build_ui(self) -> None:
         self._build_header()
@@ -89,8 +89,8 @@ class PyRollEngine:
 
         calc_tab = tk.Frame(self.notebook, bg=COLORS["bg_primary"])
         emp_tab  = tk.Frame(self.notebook, bg=COLORS["bg_primary"])
-        self.notebook.add(calc_tab, text="  Calculate  ")
-        self.notebook.add(emp_tab,  text="  Employees  ")
+        self.notebook.add(calc_tab, text="  薪资计算  ")
+        self.notebook.add(emp_tab,  text="  员工列表  ")
 
         self._build_calculator_tab(calc_tab)
         self._build_employees_tab(emp_tab)
@@ -100,7 +100,7 @@ class PyRollEngine:
         header.pack(fill="x")
         header.pack_propagate(False)
 
-        # Left accent stripe
+        # 左侧主题色装饰条
         tk.Frame(header, bg=COLORS["accent_primary"], width=5).pack(side="left", fill="y")
 
         inner = tk.Frame(header, bg=COLORS["bg_header"])
@@ -118,12 +118,12 @@ class PyRollEngine:
         bar.pack(fill="x")
         bar.pack_propagate(False)
 
-        label = "● Redis Connected" if self.db.using_redis else "● In-Memory Mode"
+        label = "● Redis 已连接" if self.db.using_redis else "● 内存模式（未连接 Redis，重启后数据不保留）"
         color = COLORS["success"]    if self.db.using_redis else COLORS["warning"]
         tk.Label(bar, text=label, font=FONTS["body_sm"],
                  fg=color, bg=COLORS["bg_secondary"]).pack(side="left", padx=PAD["xl"], pady=5)
 
-    # ── Calculate tab ──────────────────────────────────────────────────────
+    # ── 薪资计算页 ──────────────────────────────────────────────────────
 
     def _build_calculator_tab(self, parent: tk.Frame) -> None:
         canvas = tk.Canvas(parent, bg=COLORS["bg_primary"], highlightthickness=0)
@@ -142,38 +142,38 @@ class PyRollEngine:
         content = tk.Frame(inner, bg=COLORS["bg_primary"])
         content.pack(fill="both", expand=True, padx=PAD["xl"], pady=PAD["xl"])
 
-        # Input card
-        _, form = self._card(content, "Employee Details", COLORS["accent_primary"])
-        self.ent_name = self._field(form, "EMPLOYEE NAME")
-        self.ent_hours = self._field(form, "HOURS WORKED")
-        self.ent_rate  = self._field(form, f"HOURLY RATE ({CURRENCY})")
+        # 信息录入卡片
+        _, form = self._card(content, "员工信息", COLORS["accent_primary"])
+        self.ent_name = self._field(form, "员工姓名")
+        self.ent_hours = self._field(form, "工时（小时）")
+        self.ent_rate  = self._field(form, f"时薪（{CURRENCY}）")
 
-        # Two-column row: deductions + tax
+        # 两列并排：扣款 + 税率
         two = tk.Frame(form, bg=COLORS["bg_card"])
         two.pack(fill="x", pady=(0, PAD["md"]))
-        self.ent_deductions = self._inline_field(two, f"DEDUCTIONS ({CURRENCY})", side="left",  padx=(0, PAD["sm"]))
-        self.ent_tax        = self._inline_field(two, "TAX RATE (%)",       side="right", padx=(PAD["sm"], 0))
+        self.ent_deductions = self._inline_field(two, f"扣款（{CURRENCY}）", side="left",  padx=(0, PAD["sm"]))
+        self.ent_tax        = self._inline_field(two, "税率（%）",       side="right", padx=(PAD["sm"], 0))
 
-        self.ent_bonus = self._field(form, f"BONUS ({CURRENCY})")
+        self.ent_bonus = self._field(form, f"奖金（{CURRENCY}）")
 
         btns = tk.Frame(form, bg=COLORS["bg_card"])
         btns.pack(fill="x", pady=(PAD["md"], 0))
-        self._btn(btns, "Calculate Salary", self._calculate,
+        self._btn(btns, "计算薪资", self._calculate,
                   COLORS["accent_primary"], COLORS["accent_hover"]).pack(side="left", padx=(0, PAD["sm"]))
-        self._btn(btns, "Save Employee", self._save,
+        self._btn(btns, "保存员工", self._save,
                   COLORS["btn_secondary"], COLORS["btn_secondary_hover"]).pack(side="left")
 
-        # Results card
-        _, res = self._card(content, "Calculation Results", COLORS["success"])
+        # 结果卡片
+        _, res = self._card(content, "计算结果", COLORS["success"])
         self.result_text = tk.Text(
             res, height=9, font=FONTS["mono_md"],
             bg=COLORS["bg_secondary"], fg=COLORS["text_secondary"],
             relief="flat", cursor="arrow", wrap="word",
             padx=PAD["lg"], pady=PAD["md"], state="disabled")
         self.result_text.pack(fill="x")
-        self._set_result("Results will appear here after calculation.")
+        self._set_result("填写完左侧信息后，点击「计算薪资」，结果会显示在这里。")
 
-    # ── Employees tab ──────────────────────────────────────────────────────
+    # ── 员工列表页 ──────────────────────────────────────────────────────
 
     def _build_employees_tab(self, parent: tk.Frame) -> None:
         content = tk.Frame(parent, bg=COLORS["bg_primary"])
@@ -181,9 +181,9 @@ class PyRollEngine:
 
         toolbar = tk.Frame(content, bg=COLORS["bg_primary"])
         toolbar.pack(fill="x", pady=(0, PAD["md"]))
-        tk.Label(toolbar, text="All Employees", font=FONTS["heading_md"],
+        tk.Label(toolbar, text="全部员工", font=FONTS["heading_md"],
                  fg=COLORS["text_primary"], bg=COLORS["bg_primary"]).pack(side="left")
-        self._btn(toolbar, "Refresh", self._refresh_employees,
+        self._btn(toolbar, "刷新", self._refresh_employees,
                   COLORS["accent_primary"], COLORS["accent_hover"],
                   small=True).pack(side="right")
 
@@ -198,14 +198,14 @@ class PyRollEngine:
                                  style="Claude.Treeview", selectmode="browse")
 
         col_defs = [
-            ("name",       "Employee",          160, "w"),
-            ("hours",      "Hours",           60, "e"),
-            ("rate",       f"Rate ({CURRENCY})",  90, "e"),
-            ("gross",      f"Gross ({CURRENCY})", 110, "e"),
-            ("tax",        f"Tax ({CURRENCY})",  90, "e"),
-            ("deductions", f"Ded. ({CURRENCY})", 100, "e"),
-            ("bonus",      f"Bonus ({CURRENCY})",  90, "e"),
-            ("net",        f"Net ({CURRENCY})", 110, "e"),
+            ("name",       "员工",          160, "w"),
+            ("hours",      "工时",           60, "e"),
+            ("rate",       f"时薪({CURRENCY})",  90, "e"),
+            ("gross",      f"应发({CURRENCY})", 110, "e"),
+            ("tax",        f"个税({CURRENCY})",  90, "e"),
+            ("deductions", f"扣款({CURRENCY})", 100, "e"),
+            ("bonus",      f"奖金({CURRENCY})",  90, "e"),
+            ("net",        f"实发({CURRENCY})", 110, "e"),
         ]
         for cid, heading, width, anchor in col_defs:
             self.tree.heading(cid, text=heading)
@@ -224,10 +224,10 @@ class PyRollEngine:
 
         self._refresh_employees()
 
-    # ── Widget helpers ────────────────────────────────────────────────────────
+    # ── 控件辅助 ────────────────────────────────────────────────────────
 
     def _card(self, parent: tk.Frame, title: str, accent: str):
-        """Return (card_frame, body_frame) with a colored top stripe."""
+        """返回 (卡片容器, 卡片主体)，带一条彩色顶边。"""
         card = tk.Frame(parent, bg=COLORS["bg_card"],
                         highlightbackground=COLORS["border_light"], highlightthickness=1)
         card.pack(fill="x", pady=(0, PAD["lg"]))
@@ -242,7 +242,7 @@ class PyRollEngine:
         return card, body
 
     def _field(self, parent: tk.Frame, label: str) -> tk.Entry:
-        """Labeled full-width input field packed into parent."""
+        """带标签的全宽输入框。"""
         outer = tk.Frame(parent, bg=COLORS["bg_card"])
         outer.pack(fill="x", pady=(0, PAD["md"]))
 
@@ -263,7 +263,7 @@ class PyRollEngine:
 
     def _inline_field(self, parent: tk.Frame, label: str,
                       side: str, padx: tuple) -> tk.Entry:
-        """Half-width labeled field for the two-column row."""
+        """两列并排的半宽输入框。"""
         col = tk.Frame(parent, bg=COLORS["bg_card"])
         col.pack(side=side, fill="x", expand=True, padx=padx)
 
@@ -295,7 +295,7 @@ class PyRollEngine:
         btn.bind("<Leave>", lambda e: btn.config(bg=bg))
         return btn
 
-    # ── Actions ────────────────────────────────────────────────────────────
+    # ── 动作 ────────────────────────────────────────────────────────────
 
     def _set_result(self, text: str, color: str | None = None) -> None:
         self.result_text.config(state="normal")
@@ -307,7 +307,7 @@ class PyRollEngine:
     def _parse_inputs(self) -> tuple:
         name = self.ent_name.get().strip()
         if not name:
-            raise ValueError("Employee name is required.")
+            raise ValueError("请先填写员工姓名。")
         try:
             hours      = float(self.ent_hours.get()       or 0)
             rate       = float(self.ent_rate.get()        or 0)
@@ -315,9 +315,9 @@ class PyRollEngine:
             tax_rate   = float(self.ent_tax.get()         or 0)
             bonus      = float(self.ent_bonus.get()       or 0)
         except ValueError:
-            raise ValueError("Hours, Rate, Deductions, Tax, and Bonus must be numeric values.")
+            raise ValueError("工时、时薪、扣款、税率、奖金都必须是数字。")
         if min(hours, rate, deductions, tax_rate, bonus) < 0:
-            raise ValueError("Values cannot be negative.")
+            raise ValueError("各项数值不能为负数。")
         return name, hours, rate, deductions, tax_rate, bonus
 
     def _calculate(self) -> None:
@@ -326,18 +326,18 @@ class PyRollEngine:
             gross, tax, net = self.calc.calculate_salary(hours, rate, deductions, tax_rate, bonus)
             sep = "─" * 42
             lines = [
-                f"  Employee     {name}",
+                f"  员工姓名    {name}",
                 f"  {sep}",
-                f"  Gross Pay    {CURRENCY}{gross:>12,.2f}",
-                f"  Tax ({tax_rate:.1f}%)    {CURRENCY}{tax:>12,.2f}",
-                f"  Deductions   {CURRENCY}{deductions:>12,.2f}",
-                f"  Bonus        {CURRENCY}{bonus:>12,.2f}",
+                f"  应发工资    {CURRENCY}{gross:>12,.2f}",
+                f"  个人所得税（{tax_rate:.1f}%）  {CURRENCY}{tax:>8,.2f}",
+                f"  扣款合计    {CURRENCY}{deductions:>12,.2f}",
+                f"  奖金补贴    {CURRENCY}{bonus:>12,.2f}",
                 f"  {sep}",
-                f"  Net Pay      {CURRENCY}{net:>12,.2f}",
+                f"  实发工资    {CURRENCY}{net:>12,.2f}",
             ]
             self._set_result("\n".join(lines))
         except ValueError as exc:
-            messagebox.showerror("Input Error", str(exc))
+            messagebox.showerror("输入错误", str(exc))
 
     def _save(self) -> None:
         try:
@@ -348,11 +348,11 @@ class PyRollEngine:
                 "deductions": deductions, "tax_rate": tax_rate,
                 "bonus": bonus, "gross": gross, "tax": tax, "net_salary": net,
             })
-            messagebox.showinfo("Saved", f"'{name}' has been saved successfully.")
+            messagebox.showinfo("保存成功", f"员工「{name}」已保存。")
             self._refresh_employees()
             self.notebook.select(1)
         except ValueError as exc:
-            messagebox.showerror("Input Error", str(exc))
+            messagebox.showerror("输入错误", str(exc))
 
     def _refresh_employees(self) -> None:
         for item in self.tree.get_children():
@@ -368,7 +368,7 @@ class PyRollEngine:
                 gross, tax, net = self.calc.calculate_salary(hours, rate, deductions, tax_rate, bonus)
                 tag = "odd" if i % 2 == 0 else "even"
                 self.tree.insert("", "end", values=(
-                    emp.get("name", "-"),
+                    emp.get("name", "—"),
                     f"{hours:.0f}",
                     f"{CURRENCY}{rate:.2f}",
                     f"{CURRENCY}{gross:,.2f}",

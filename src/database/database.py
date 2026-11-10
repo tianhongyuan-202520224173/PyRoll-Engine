@@ -1,4 +1,4 @@
-"""Employee data storage — Redis primary, in-memory fallback."""
+"""员工数据存储 —— Redis 优先，未连接时自动回退到内存。"""
 
 import json
 import logging
@@ -18,13 +18,13 @@ _DB   = int(os.getenv("REDIS_DB",   "0"))
 _KEY  = "pyroll:employees"
 
 _DEMO_EMPLOYEES = [
-    {"name": "John Doe",   "hours": 40, "rate": 20.0, "deductions": 100.0, "tax_rate": 10.0, "bonus": 50.0},
-    {"name": "Jane Smith", "hours": 35, "rate": 25.0, "deductions": 150.0, "tax_rate": 15.0, "bonus": 75.0},
+    {"name": "张三", "hours": 40, "rate": 45.0, "deductions": 200.0, "tax_rate": 3.0, "bonus": 300.0},
+    {"name": "李四", "hours": 35, "rate": 38.0, "deductions": 150.0, "tax_rate": 3.0, "bonus": 200.0},
 ]
 
 
 class Database:
-    """Thin wrapper around Redis with transparent in-memory fallback."""
+    """Redis 的轻量封装，带透明的内存回退。"""
 
     def __init__(self) -> None:
         self.using_redis = False
@@ -50,7 +50,7 @@ class Database:
             logger.warning("Redis unavailable (%s) — falling back to in-memory", exc)
 
     def _seed(self) -> None:
-        """Populate demo records only when storage is empty."""
+        """仅在存储为空时写入演示数据。"""
         if self.using_redis:
             if self._client.llen(_KEY) == 0:
                 for emp in _DEMO_EMPLOYEES:
