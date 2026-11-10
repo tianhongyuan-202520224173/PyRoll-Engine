@@ -1,1 +1,29 @@
-__pycache__
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+
+# 虚拟环境
+.venv/
+venv/
+env/
+
+# 构建产物（只走 Release，不进仓库）
+build/
+dist/
+*.spec
+*.exe
+*.msi
+
+# 敏感信息
+.env
+*.key
+*_credentials*.json
+
+# 编辑器与系统文件
+.idea/
+.vscode/
+Thumbs.db
+.DS_Store
+*.log
