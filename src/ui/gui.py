@@ -1,11 +1,15 @@
-"""PyRoll Engine — main application window with Claude-inspired UI."""
+"""PyRoll Engine — main application window, rebranded with custom name & icon."""
 
+import os
 import tkinter as tk
 from tkinter import ttk, messagebox
 
+from ..branding import APP_NAME, APP_SUBTITLE, ICON_PATH
 from ..database.database import Database
 from ..engine.payroll import PayrollCalculator
 from .theme import COLORS, FONTS, PAD
+
+CURRENCY = "$"
 
 
 class PyRollEngine:
@@ -18,17 +22,26 @@ class PyRollEngine:
         self._setup_styles()
         self._build_ui()
 
-    # ── Window & styles ─────────────────────────────────────────────────
+    # ── Window & styles ───────────────────────────────────────────────────────
 
     def _setup_window(self) -> None:
         self.root = tk.Tk()
-        self.root.title("PyRoll Engine")
+        self.root.title(APP_NAME)
         self.root.geometry("760x840")
         self.root.minsize(640, 700)
         self.root.configure(bg=COLORS["bg_primary"])
+        self._apply_icon()
         self.root.update_idletasks()
         sw, sh = self.root.winfo_screenwidth(), self.root.winfo_screenheight()
         self.root.geometry(f"760x840+{(sw-760)//2}+{(sh-840)//2}")
+
+    def _apply_icon(self) -> None:
+        """Set the window icon; missing icon never blocks startup."""
+        if ICON_PATH and os.path.exists(ICON_PATH):
+            try:
+                self.root.iconbitmap(default=ICON_PATH)
+            except tk.TclError:
+                pass
 
     def _setup_styles(self) -> None:
         s = ttk.Style()
@@ -65,7 +78,7 @@ class PyRollEngine:
             background=[("selected", COLORS["bg_hover"])],
             foreground=[("selected", COLORS["text_primary"])])
 
-    # ── Top-level layout ────────────────────────────────────────────────
+    # ── Top-level layout ────────────────────────────────────────────────────────
 
     def _build_ui(self) -> None:
         self._build_header()
@@ -93,10 +106,10 @@ class PyRollEngine:
         inner = tk.Frame(header, bg=COLORS["bg_header"])
         inner.pack(side="left", fill="both", expand=True, padx=PAD["xl"])
 
-        tk.Label(inner, text="PyRoll Engine",
+        tk.Label(inner, text=APP_NAME,
                  font=FONTS["heading_lg"], fg=COLORS["text_on_dark"],
                  bg=COLORS["bg_header"]).pack(side="left", pady=PAD["lg"])
-        tk.Label(inner, text="  —  Payroll Management System",
+        tk.Label(inner, text=f"  —  {APP_SUBTITLE}",
                  font=FONTS["body_md"], fg=COLORS["text_muted"],
                  bg=COLORS["bg_header"]).pack(side="left")
 
@@ -110,7 +123,7 @@ class PyRollEngine:
         tk.Label(bar, text=label, font=FONTS["body_sm"],
                  fg=color, bg=COLORS["bg_secondary"]).pack(side="left", padx=PAD["xl"], pady=5)
 
-    # ── Calculate tab ───────────────────────────────────────────────────
+    # ── Calculate tab ──────────────────────────────────────────────────────
 
     def _build_calculator_tab(self, parent: tk.Frame) -> None:
         canvas = tk.Canvas(parent, bg=COLORS["bg_primary"], highlightthickness=0)
@@ -133,15 +146,15 @@ class PyRollEngine:
         _, form = self._card(content, "Employee Details", COLORS["accent_primary"])
         self.ent_name = self._field(form, "EMPLOYEE NAME")
         self.ent_hours = self._field(form, "HOURS WORKED")
-        self.ent_rate  = self._field(form, "HOURLY RATE ($)")
+        self.ent_rate  = self._field(form, f"HOURLY RATE ({CURRENCY})")
 
         # Two-column row: deductions + tax
         two = tk.Frame(form, bg=COLORS["bg_card"])
         two.pack(fill="x", pady=(0, PAD["md"]))
-        self.ent_deductions = self._inline_field(two, "DEDUCTIONS ($)", side="left",  padx=(0, PAD["sm"]))
-        self.ent_tax        = self._inline_field(two, "TAX RATE (%)",   side="right", padx=(PAD["sm"], 0))
+        self.ent_deductions = self._inline_field(two, f"DEDUCTIONS ({CURRENCY})", side="left",  padx=(0, PAD["sm"]))
+        self.ent_tax        = self._inline_field(two, "TAX RATE (%)",       side="right", padx=(PAD["sm"], 0))
 
-        self.ent_bonus = self._field(form, "BONUS ($)")
+        self.ent_bonus = self._field(form, f"BONUS ({CURRENCY})")
 
         btns = tk.Frame(form, bg=COLORS["bg_card"])
         btns.pack(fill="x", pady=(PAD["md"], 0))
@@ -160,7 +173,7 @@ class PyRollEngine:
         self.result_text.pack(fill="x")
         self._set_result("Results will appear here after calculation.")
 
-    # ── Employees tab ───────────────────────────────────────────────────
+    # ── Employees tab ──────────────────────────────────────────────────────
 
     def _build_employees_tab(self, parent: tk.Frame) -> None:
         content = tk.Frame(parent, bg=COLORS["bg_primary"])
@@ -185,14 +198,14 @@ class PyRollEngine:
                                  style="Claude.Treeview", selectmode="browse")
 
         col_defs = [
-            ("name",       "Employee",        160, "w"),
-            ("hours",      "Hours",             60, "e"),
-            ("rate",       "Rate ($)",          80, "e"),
-            ("gross",      "Gross Pay ($)",    100, "e"),
-            ("tax",        "Tax ($)",           80, "e"),
-            ("deductions", "Deductions ($)",   110, "e"),
-            ("bonus",      "Bonus ($)",         80, "e"),
-            ("net",        "Net Pay ($)",      100, "e"),
+            ("name",       "Employee",          160, "w"),
+            ("hours",      "Hours",           60, "e"),
+            ("rate",       f"Rate ({CURRENCY})",  90, "e"),
+            ("gross",      f"Gross ({CURRENCY})", 110, "e"),
+            ("tax",        f"Tax ({CURRENCY})",  90, "e"),
+            ("deductions", f"Ded. ({CURRENCY})", 100, "e"),
+            ("bonus",      f"Bonus ({CURRENCY})",  90, "e"),
+            ("net",        f"Net ({CURRENCY})", 110, "e"),
         ]
         for cid, heading, width, anchor in col_defs:
             self.tree.heading(cid, text=heading)
@@ -211,7 +224,7 @@ class PyRollEngine:
 
         self._refresh_employees()
 
-    # ── Widget helpers ──────────────────────────────────────────────────
+    # ── Widget helpers ────────────────────────────────────────────────────────
 
     def _card(self, parent: tk.Frame, title: str, accent: str):
         """Return (card_frame, body_frame) with a colored top stripe."""
@@ -282,7 +295,7 @@ class PyRollEngine:
         btn.bind("<Leave>", lambda e: btn.config(bg=bg))
         return btn
 
-    # ── Actions ─────────────────────────────────────────────────────────
+    # ── Actions ────────────────────────────────────────────────────────────
 
     def _set_result(self, text: str, color: str | None = None) -> None:
         self.result_text.config(state="normal")
@@ -303,6 +316,8 @@ class PyRollEngine:
             bonus      = float(self.ent_bonus.get()       or 0)
         except ValueError:
             raise ValueError("Hours, Rate, Deductions, Tax, and Bonus must be numeric values.")
+        if min(hours, rate, deductions, tax_rate, bonus) < 0:
+            raise ValueError("Values cannot be negative.")
         return name, hours, rate, deductions, tax_rate, bonus
 
     def _calculate(self) -> None:
@@ -313,12 +328,12 @@ class PyRollEngine:
             lines = [
                 f"  Employee     {name}",
                 f"  {sep}",
-                f"  Gross Pay    ${gross:>12,.2f}",
-                f"  Tax ({tax_rate:.1f}%)    ${tax:>12,.2f}",
-                f"  Deductions   ${deductions:>12,.2f}",
-                f"  Bonus        ${bonus:>12,.2f}",
+                f"  Gross Pay    {CURRENCY}{gross:>12,.2f}",
+                f"  Tax ({tax_rate:.1f}%)    {CURRENCY}{tax:>12,.2f}",
+                f"  Deductions   {CURRENCY}{deductions:>12,.2f}",
+                f"  Bonus        {CURRENCY}{bonus:>12,.2f}",
                 f"  {sep}",
-                f"  Net Pay      ${net:>12,.2f}",
+                f"  Net Pay      {CURRENCY}{net:>12,.2f}",
             ]
             self._set_result("\n".join(lines))
         except ValueError as exc:
@@ -353,14 +368,14 @@ class PyRollEngine:
                 gross, tax, net = self.calc.calculate_salary(hours, rate, deductions, tax_rate, bonus)
                 tag = "odd" if i % 2 == 0 else "even"
                 self.tree.insert("", "end", values=(
-                    emp.get("name", "—"),
+                    emp.get("name", "-"),
                     f"{hours:.0f}",
-                    f"${rate:.2f}",
-                    f"${gross:,.2f}",
-                    f"${tax:,.2f}",
-                    f"${deductions:,.2f}",
-                    f"${bonus:,.2f}",
-                    f"${net:,.2f}",
+                    f"{CURRENCY}{rate:.2f}",
+                    f"{CURRENCY}{gross:,.2f}",
+                    f"{CURRENCY}{tax:,.2f}",
+                    f"{CURRENCY}{deductions:,.2f}",
+                    f"{CURRENCY}{bonus:,.2f}",
+                    f"{CURRENCY}{net:,.2f}",
                 ), tags=(tag,))
             except (ValueError, KeyError):
                 continue
